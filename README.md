@@ -12,26 +12,26 @@ use evtest to figure out which /dev/input/event* device is your keyboard.
 for me it's `/dev/input/event3`
 
 ```sh
-gcc main.c -o stupidlayers
-sudo ./stupidlayers /dev/input/event3
+gcc main.c -o capsesc
+sudo ./capsesc /dev/input/event3
 ```
 
 if you run this by hand on the keyboard that gets captured you might
 end up with the enter key getting stuck from missing the release event.
 just press enter again to stop it
 
-ideally you want a udev rule that automatically runs stupidlayers when
+ideally you want a udev rule that automatically runs capsesc when
 the keyboard is plugged in, here's an example for void linux (assumes you
-copied stupidlayers to /usr/bin)
+copied capsesc to /usr/bin)
 
 note that the rules.d directory might be different in other distros
 
 ```sh
-sudo tee /usr/lib/udev/rules.d/30-stupidlayers.rules << "EOF"
+sudo tee /usr/lib/udev/rules.d/30-capsesc.rules << "EOF"
 ACTION=="add", \
 KERNEL=="event[0-9]*", \
 ATTRS{name}=="SONiX USB DEVICE", \
-RUN+="/bin/sh -c 'echo /usr/bin/stupidlayers /dev/input/%k | at now'"
+RUN+="/bin/sh -c 'echo /usr/bin/capsesc /dev/input/%k | at now'"
 EOF
 
 sudo xbps-install at
@@ -47,11 +47,11 @@ your xinitrc or something, but it won't stick if you unplug the keyboard
 example of finding a device by name (what I have in my xinitrc):
 
 ```sh
-sudo killall stupidlayers
+sudo killall capsesc
 for x in /dev/input/event*; do
   devname=$(cat $(echo $x | sed 's|dev|sys/class|g')/device/name)
   if [ "$devname" = "SONiX USB DEVICE" ]; then
-    sudo stupidlayers $x &
+    sudo capsesc $x &
     break
   fi
 done
